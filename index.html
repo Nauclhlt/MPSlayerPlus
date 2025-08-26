@@ -90,7 +90,6 @@
         if(line.startsWith(">")){
           const parts = line.slice(1).trim().split(",");
           const filename = parts[1]?.trim();
-          alert(filename);
           if(filename) audioFiles.add(filename);
         }
       });
