@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MPSlayer+</title>
+  <style>
+    :root{
+      --bg: #fafafa;
+      --fg: #1f2328;
+      --muted: #60636b;
+      --accent: #3a72ff;
+      --card: #ffffff;
+      --border: #e6e6e6;
+      --font-sans: -apple-system, "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+      --font-serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+      --lh: 1.85;
+      --maxw: 760px;
+      --radius: 16px;
+      --shadow: 0 6px 24px rgba(0,0,0,.06);
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: #0f1115;
+        --fg: #e7e9ee;
+        --muted: #a4a8b3;
+        --accent: #5EA0FF; /* ダークでも見やすい */
+        --card: #151821;
+        --border: #2a2f3a;
+        --shadow: none;
+      }
+    }
+    *{ box-sizing: border-box; }
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family:var(--font-sans); line-height:var(--lh);
+    }
+    .script{
+      max-width: var(--maxw);
+      margin: 20px auto;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    h3{ font-size: 1.25rem; margin: 1em 0 .5em; border-left: 6px solid var(--accent); padding-left: .5em; }
+    .line{ display:grid; grid-template-columns:8em 1fr; gap:.5em 1em; margin:.4em 0; }
+    .character{ font-weight:bold; text-align:right; }
+    .dialogue{ font-size:1rem; }
+    .aside{ font-family:var(--font-serif); font-size:.95em; color:var(--muted); margin:.8em 0; }
+    .aside.center{ text-align:center; }
+    .scene-break{ margin:1.4em 0; height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); border:none; }
+
+    /* 再生ボタン */
+    .audio-btn{
+      display:block;
+      width:100%;
+      padding: 0.8em 1em;
+      margin: .7em 0;
+      font-size:1rem;
+      font-weight:bold;
+      text-align:center;
+      border:none;
+      border-radius:12px;
+      background:var(--accent);
+      color:white;
+      cursor:pointer;
+      box-shadow:0 3px 6px rgba(0,0,0,.2);
+      transition: background .2s, transform .1s;
+    }
+    .audio-btn:hover{ background:color-mix(in oklab, var(--accent) 85%, white 15%); }
+    .audio-btn:active{ transform: translateY(2px); }
+  </style>
+</head>
+<body>
+  <main class="script" id="script-root">
+  </main>
+
+  <script>
+    async function loadScript() {
+      try {
+        const res = await fetch("script.txt");
+        const text = await res.text();
+        const lines = text.split(/\r?\n/);
+        const root = document.getElementById("script-root");
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+
+          // --- : シーン区切り
+          if (line.trim() === "---") {
+            const hr = document.createElement("hr");
+            hr.className = "scene-break";
+            root.appendChild(hr);
+            continue;
+          }
+
+          // # 内容 : aside center
+          if (line.startsWith("#")) {
+            const div = document.createElement("div");
+            div.className = "aside center";
+            div.textContent = line.slice(1).trim();
+            root.appendChild(div);
+            continue;
+          }
+
+          // $ 内容 : シーンタイトル h3
+          if (line.startsWith("$")) {
+            const h3 = document.createElement("h3");
+            h3.textContent = line.slice(1).trim();
+            root.appendChild(h3);
+            continue;
+          }
+
+          // > ボタンテキスト,ファイル名
+          // > ボタンテキスト,ファイル名,タイプ
+            if (line.startsWith(">")) {
+                const rest = line.slice(1).trim();
+                const parts = rest.split(",");
+                const label = parts[0]?.trim() || "▶ 再生";
+                const filename = parts[1]?.trim();
+                const type = parts[2]?.trim().toLowerCase();
+
+                let icon = "▶";
+                if (type === "music") icon = "♪";
+                if (type === "effect") icon = "★";
+
+                if (filename) {
+                    const btn = document.createElement("button");
+                    btn.className = "audio-btn";
+                    btn.textContent = icon + " " + label;
+                    btn.addEventListener("click", () => {
+                    const audio = new Audio("audio/" + filename);
+                    audio.currentTime = 0;
+                    audio.play();
+                    });
+                    root.appendChild(btn);
+                }
+                continue;
+            }
+
+
+          // 人物:台詞
+          const sep = line.indexOf(":");
+          if (sep !== -1) {
+            const character = line.slice(0, sep).trim();
+            const dialogue = line.slice(sep + 1).trim();
+            const container = document.createElement("div");
+            container.className = "line";
+
+            const cDiv = document.createElement("div");
+            cDiv.className = "character";
+            cDiv.textContent = character;
+
+            const dDiv = document.createElement("div");
+            dDiv.className = "dialogue";
+            dDiv.textContent = dialogue;
+
+            container.appendChild(cDiv);
+            container.appendChild(dDiv);
+            root.appendChild(container);
+            continue;
+          }
+
+          // デフォルト：aside
+          const div = document.createElement("div");
+          div.className = "aside";
+          div.textContent = line;
+          root.appendChild(div);
+        }
+      } catch (e) {
+        console.error(e);
+        document.getElementById("script-root").innerHTML += "<p style='color:red'>script.txt を読み込めませんでした。</p>";
+      }
+    }
+    loadScript();
+  </script>
+</body>
+</html>

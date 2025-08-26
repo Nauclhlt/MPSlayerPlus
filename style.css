@@ -1,0 +1,192 @@
+/* ===== Play Script Base (iPad-friendly) ===== */
+:root{
+  --bg: #fafafa;
+  --fg: #1f2328;
+  --muted: #60636b;
+  --accent: #3a72ff;
+  --card: #ffffff;
+  --border: #e6e6e6;
+  --font-sans: -apple-system, "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+  --font-serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  --lh: 1.85;
+  --maxw: 760px; /* iPad縦で読みやすい幅 */
+  --pad: 20px;
+  --radius: 16px;
+  --shadow: 0 6px 24px rgba(0,0,0,.06);
+}
+
+/* ダークモード対応（任意） */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0f1115;
+    --fg: #e7e9ee;
+    --muted: #a4a8b3;
+    --card: #151821;
+    --border: #2a2f3a;
+    --shadow: none;
+  }
+}
+
+*{ box-sizing: border-box; }
+html, body{
+  height: 100%;
+  background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 85%, white 15%));
+}
+body{
+  margin: 0;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  line-height: var(--lh);
+  -webkit-text-size-adjust: 100%; /* iOSでのフォント拡大防止 */
+}
+
+/* ルートコンテナ */
+.script{
+  max-width: var(--maxw);
+  margin: clamp(12px, 3vw, 28px) auto;
+  padding: clamp(14px, 3vw, 28px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* 見出し（タイトル・幕・シーン） */
+.script h1, .script h2, .script h3{
+  margin: 0 0 .4em;
+  line-height: 1.35;
+  letter-spacing: .02em;
+}
+.script h1{
+  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+  font-weight: 800;
+}
+.script h2{
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  font-weight: 700;
+  border-left: 6px solid var(--accent);
+  padding-left: .6em;
+}
+.script h3{
+  font-size: clamp(1.15rem, 2.2vw, 1.35rem);
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* 本文（地の文など） */
+.script p{
+  margin: .75em 0;
+  text-wrap: pretty;
+  hanging-punctuation: first allow-end; /* 対応ブラウザで句読点のぶら下げ */
+}
+
+/* 台本レイアウト：登場人物名＋セリフ（2カラム→狭幅で縦） */
+.line{
+  display: grid;
+  grid-template-columns: 8.5em 1fr;
+  gap: .75em 1em;
+  align-items: start;
+  padding: .35em 0;
+}
+@media (max-width: 680px){
+  .line{
+    grid-template-columns: 1fr;
+    gap: .25em;
+  }
+}
+
+/* 登場人物名 */
+.character{
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-align: right;
+  color: var(--fg);
+}
+@media (max-width: 680px){
+  .character{ text-align: left; }
+}
+
+/* セリフ本文 */
+.dialogue{
+  font-size: clamp(1rem, 1.7vw, 1.075rem);
+}
+
+/* ト書き（舞台指示） */
+.aside{
+  font-family: var(--font-serif);
+  font-size: .95em;
+  color: var(--muted);
+  background: color-mix(in oklab, var(--card) 92%, var(--border));
+  border-left: 4px solid var(--border);
+  padding: .5em .75em;
+  border-radius: 10px;
+  margin: .75em 0;
+}
+
+/* 小ト書き（セリフ内括弧など） */
+.parenthetical{
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* 場面転換の区切り */
+.scene-break{
+  margin: 1.6em 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  border: none;
+}
+
+/* ト書きだけ中央表示したい時 */
+.center{ text-align: center; }
+.right{ text-align: right; }
+
+/* 備考・注釈 */
+.note{
+  margin: 1em 0;
+  padding: .75em .9em;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+}
+
+/* ルビ（日本語ふりがな）微調整 */
+ruby{ ruby-position: over; }
+rt{ font-size: .6em; opacity: .85; }
+
+/* タップしやすい目次（任意） */
+.toc{
+  display: flex; flex-wrap: wrap; gap: .5em;
+  padding: .75em; margin: 0 0 1em;
+  background: color-mix(in oklab, var(--card) 94%, var(--border));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.toc a{
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: .35em .6em;
+  border-radius: 999px;
+  font-size: .95em;
+}
+.toc a:active{ transform: translateY(1px); }
+
+/* フッター（配役表やクレジットなど） */
+.footer{
+  margin-top: 1.8em;
+  padding-top: 1em;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: .95em;
+}
+
+/* 印刷最適化（台本配布用） */
+@media print{
+  body{ background: white; }
+  .script{
+    box-shadow: none; border: none; margin: 0; max-width: none; padding: 0;
+  }
+  .scene-break{ break-after: avoid; }
+  .page-break{ break-after: page; }
+  a{ color: black; text-decoration: none; }
+}
