@@ -79,106 +79,106 @@
 
   <script>
     async function loadScript() {
-  const res = await fetch("script.txt");
-  const text = await res.text();
-  const lines = text.split(/\r?\n/);
-  const root = document.getElementById("script-container");
+      const res = await fetch("script.txt");
+      const text = await res.text();
+      const lines = text.split(/\r?\n/);
+      const root = document.getElementById("script-root");
+      // audioタグを事前生成
+      const audioFiles = new Set();
+      lines.forEach(line => {
+        if(line.startsWith(">")){
+          const parts = line.slice(1).trim().split(",");
+          const filename = parts[1]?.trim();
+          alert(filename);
+          if(filename) audioFiles.add(filename);
+        }
+      });
 
-  // audioタグの事前生成
-  const audioFiles = new Set();
-  lines.forEach(line => {
-    if(line.startsWith(">")) {
-      const parts = line.slice(1).trim().split(",");
-      const filename = parts[1]?.trim();
-      if(filename) audioFiles.add(filename);
-    }
-  });
+      audioFiles.forEach(file => {
+        const audio = document.createElement("audio");
+        audio.id = "audio_" + file;
+        audio.src = "audio/" + file;
+        audio.preload = "auto";
+        root.appendChild(audio);
+      });
 
-  audioFiles.forEach(file => {
-    const audio = document.createElement("audio");
-    audio.id = "audio_" + file;
-    audio.src = "audio/" + file;
-    audio.preload = "auto";
-    root.appendChild(audio);
-  });
+      for(const line of lines){
+        if(!line.trim()) continue;
 
-  for (const line of lines) {
-    if (!line.trim()) continue;
+        if(line.trim() === "---"){
+          const hr = document.createElement("hr");
+          hr.className = "scene-break";
+          root.appendChild(hr);
+          continue;
+        }
 
-    if (line.trim() === "---") {
-      const hr = document.createElement("hr");
-      hr.className = "scene-break";
-      root.appendChild(hr);
-      continue;
-    }
+        if(line.startsWith("#")){
+          const div = document.createElement("div");
+          div.className = "aside center";
+          div.textContent = line.slice(1).trim();
+          root.appendChild(div);
+          continue;
+        }
 
-    if (line.startsWith("#")) {
-      const div = document.createElement("div");
-      div.className = "aside center";
-      div.textContent = line.slice(1).trim();
-      root.appendChild(div);
-      continue;
-    }
+        if(line.startsWith("$")){
+          const h3 = document.createElement("h3");
+          h3.textContent = line.slice(1).trim();
+          root.appendChild(h3);
+          continue;
+        }
 
-    if (line.startsWith("$")) {
-      const h3 = document.createElement("h3");
-      h3.textContent = line.slice(1).trim();
-      root.appendChild(h3);
-      continue;
-    }
+        if(line.startsWith(">")){
+          const parts = line.slice(1).trim().split(",");
+          const label = parts[0]?.trim() || "▶ 再生";
+          const filename = parts[1]?.trim();
+          const type = parts[2]?.trim()?.toLowerCase();
+          let icon = "▶";
+          if(type==="music") icon="♪";
+          if(type==="effect") icon="★";
 
-    if (line.startsWith(">")) {
-      const parts = line.slice(1).trim().split(",");
-      const label = parts[0]?.trim() || "▶ 再生";
-      const filename = parts[1]?.trim();
-      const type = parts[2]?.trim()?.toLowerCase();
-      let icon = "▶";
-      if(type === "music") icon = "♪";
-      if(type === "effect") icon = "★";
-
-      if(filename){
-        const btn = document.createElement("button");
-        btn.className = "audio-btn";
-        btn.textContent = icon + " " + label;
-        btn.addEventListener("click", () => {
-          const audio = document.getElementById("audio_" + filename);
-          if(audio){
-            audio.currentTime = 0;
-            audio.play();
+          if(filename){
+            const btn = document.createElement("button");
+            btn.className = "audio-btn";
+            btn.textContent = icon + " " + label;
+            btn.addEventListener("click", ()=>{
+              const audio = document.getElementById("audio_" + filename);
+              if(audio){
+                audio.currentTime = 0;
+                audio.play();
+              }
+            });
+            root.appendChild(btn);
           }
-        });
-        root.appendChild(btn);
+          continue;
+        }
+
+        const sep = line.indexOf(":");
+        if(sep!==-1){
+          const character = line.slice(0,sep).trim();
+          const dialogue = line.slice(sep+1).trim();
+          const container = document.createElement("div");
+          container.className="line";
+
+          const cDiv = document.createElement("div");
+          cDiv.className="character";
+          cDiv.textContent = character;
+
+          const dDiv = document.createElement("div");
+          dDiv.className="dialogue";
+          dDiv.textContent=dialogue;
+
+          container.appendChild(cDiv);
+          container.appendChild(dDiv);
+          root.appendChild(container);
+          continue;
+        }
+
+        const div = document.createElement("div");
+        div.className="aside";
+        div.textContent=line;
+        root.appendChild(div);
       }
-      continue;
     }
-
-    const sep = line.indexOf(":");
-    if(sep !== -1){
-      const character = line.slice(0, sep).trim();
-      const dialogue = line.slice(sep+1).trim();
-      const container = document.createElement("div");
-      container.className = "line";
-
-      const cDiv = document.createElement("div");
-      cDiv.className = "character";
-      cDiv.textContent = character;
-
-      const dDiv = document.createElement("div");
-      dDiv.className = "dialogue";
-      dDiv.textContent = dialogue;
-
-      container.appendChild(cDiv);
-      container.appendChild(dDiv);
-      root.appendChild(container);
-      continue;
-    }
-
-    const div = document.createElement("div");
-    div.className = "aside";
-    div.textContent = line;
-    root.appendChild(div);
-  }
-}
     loadScript();
   </script>
 </body>
