@@ -28,8 +28,13 @@ self.addEventListener("activate", event => {
 });
 
 // オフライン対応
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request).then(res => res || fetch(event.request))
+self.addEventListener("fetch", e => {
+  e.respondWith(
+    caches.open(CACHE_NAME).then(cache =>
+      fetch(e.request).then(res => {
+        cache.put(e.request, res.clone());
+        return res;
+      }).catch(() => caches.match(e.request))
+    )
   );
 });
