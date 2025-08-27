@@ -143,8 +143,13 @@
             btn.addEventListener("click", ()=>{
               const audio = document.getElementById("audio_" + filename);
               if(audio){
+                if (!audio.paused) {
                 audio.currentTime = 0;
                 audio.play();
+                } else {
+                  audio.pause();
+                  audio.currentTime = 0;
+                }
               }
             });
             root.appendChild(btn);
