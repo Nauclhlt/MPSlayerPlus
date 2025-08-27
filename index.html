@@ -143,7 +143,7 @@
             btn.addEventListener("click", ()=>{
               const audio = document.getElementById("audio_" + filename);
               if(audio){
-                if (!audio.paused) {
+                if (audio.paused) {
                 audio.currentTime = 0;
                 audio.play();
                 } else {
