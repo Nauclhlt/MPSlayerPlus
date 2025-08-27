@@ -1,4 +1,4 @@
-const CACHE_NAME = "script-viewer-v1";
+const CACHE_NAME = "script-viewer-v111";
 const ASSETS = [
   "index.html",
   "styles.css",
