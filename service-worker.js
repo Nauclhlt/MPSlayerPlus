@@ -40,13 +40,20 @@ self.addEventListener("activate", event => {
 });
 
 // オフライン対応
-self.addEventListener("fetch", e => {
-  e.respondWith(
-    caches.open(CACHE_NAME).then(cache =>
-      fetch(e.request).then(res => {
-        cache.put(e.request, res.clone());
-        return res;
-      }).catch(() => caches.match(e.request))
-    )
+self.addEventListener("fetch", event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      // キャッシュにあればそれを返す
+      if (response) return response;
+
+      // なければネットワークから取ってキャッシュに保存
+      return fetch(event.request).then(res => {
+        return caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, res.clone());
+          return res;
+        });
+      });
+    })
   );
 });
+
