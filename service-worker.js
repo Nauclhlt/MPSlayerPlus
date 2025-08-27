@@ -7,7 +7,19 @@ const ASSETS = [
   "manifest.json",
   "icons/icon-192.png",
   "icons/icon-512.png",
-  "audio/explode.mp3"
+  "audio/explode.mp3",
+  "audio/taihou.mp3",
+  "audio/wind.mp3",
+  "audio/minsyu.mp3",
+  "audio/redandblack.mp3",
+  "audio/whoami.m4a",
+  "audio/yume.mp3",
+  "audio/ichinichi.mp3",
+  "audio/syujin.mp3",
+  "audio/onmyown.mp3",
+  "audio/handgun.mp3",
+  "audio/shotgun.mp3",
+  "audio/puryume.wav"
   // 必要に応じて audio/ 内のファイルも追加
 ];
 
